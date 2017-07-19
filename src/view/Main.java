@@ -15,7 +15,7 @@ public class Main {
         ContatoDAO dao = new ContatoDAO();
 //        dao.update(contato);
         
-        System.out.println(dao.selectById(2));
+        System.out.println(dao.selectByLike("988772241"));
     }
     
 }

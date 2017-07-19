@@ -79,7 +79,7 @@ public class ContatoDAO {
             System.out.println("ERRO: " + error);
         } finally {
             db.close();
-            return null;
+            return contatos;
         }
     }
     
@@ -104,8 +104,29 @@ public class ContatoDAO {
         }
     }
     
-    public List<Contato> selectByLike(String texto) {
-        return null;
+    public List<Contato> selectByLike(String filter) {
+        List<Contato> contatos = new ArrayList();
+        String filtro = "%" + filter + "%";
+        try {
+            db.open();
+            String sql = "SELECT * FROM tb_contatos WHERE con_nome LIKE ? OR con_fone LIKE ?";
+            PreparedStatement ps = db.getConnetion().prepareStatement(sql);
+            ps.setString(1, filtro);
+            ps.setString(2, filtro);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Contato contato = new Contato();
+                contato.setId(rs.getInt("con_id"));
+                contato.setNome(rs.getString("con_nome"));
+                contato.setFone(rs.getString("con_fone"));
+                contatos.add(contato);
+            }
+        } catch(SQLException error) {
+            System.out.println("ERRO: " + error);
+        } finally {
+            db.close();
+            return contatos;
+        }
     }
     
 }
