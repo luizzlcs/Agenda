@@ -1,19 +1,21 @@
 package view;
 
-import dao.ContatoDAO;
+import controller.ContatoCTRL;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.util.Vector;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import model.Contato;
+import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 public class ContatoVIEW extends JFrame {
 
@@ -25,6 +27,7 @@ public class ContatoVIEW extends JFrame {
     
     public ContatoVIEW() {
         inicializarComponentes();
+        definirEventos();
     }
     
     private void inicializarComponentes() {
@@ -64,7 +67,13 @@ public class ContatoVIEW extends JFrame {
             }
         };
         
-        carregar();
+        carregarTabela();
+        
+        DefaultTableCellRenderer alinharDireita = new DefaultTableCellHeaderRenderer();
+        alinharDireita.setHorizontalAlignment(SwingConstants.RIGHT);
+        
+        DefaultTableCellRenderer alinharCentro = new DefaultTableCellHeaderRenderer();
+        alinharCentro.setHorizontalAlignment(SwingConstants.CENTER);
         
         tbContatos = new JTable(tmContatos);
         tbContatos.getColumnModel().getColumn(0).setPreferredWidth(10);
@@ -73,17 +82,29 @@ public class ContatoVIEW extends JFrame {
         tbContatos.getTableHeader().setReorderingAllowed(false);
         tbContatos.getTableHeader().setResizingAllowed(false);
         
+        tbContatos.getColumnModel().getColumn(0).setCellRenderer(alinharCentro);
+        tbContatos.getColumnModel().getColumn(2).setCellRenderer(alinharDireita);
+        
         spContatos = new JScrollPane(tbContatos);
         spContatos.setBounds(10, 70, 375, 280);
         add(spContatos);
     }
     
-    private void carregar() {
-        tmContatos.setRowCount(0);
-        for (Contato contato : new ContatoDAO().selectAll()) {
-            Object[] linha = {contato.getId(), contato.getNome(), contato.getFone()};
-            tmContatos.addRow(linha);
-        }
+    private void definirEventos() {
+        tfPesquisar.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {}
+            @Override
+            public void keyPressed(KeyEvent e) {}
+            @Override
+            public void keyReleased(KeyEvent e) {
+                carregarTabela();
+            }
+        });
+    }
+    
+    private void carregarTabela() {
+        tmContatos = new ContatoCTRL().listarTodosContatos(tmContatos, tfPesquisar.getText());
     }
     
     public static void main(String[] args) {
