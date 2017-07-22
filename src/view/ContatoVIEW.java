@@ -4,17 +4,21 @@ import controller.ContatoCTRL;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import model.Contato;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 
 public class ContatoVIEW extends JFrame {
@@ -69,23 +73,26 @@ public class ContatoVIEW extends JFrame {
         
         carregarTabela();
         
-        DefaultTableCellRenderer alinharDireita = new DefaultTableCellHeaderRenderer();
+        DefaultTableCellRenderer alinharDireita = new DefaultTableCellRenderer();
         alinharDireita.setHorizontalAlignment(SwingConstants.RIGHT);
         
-        DefaultTableCellRenderer alinharCentro = new DefaultTableCellHeaderRenderer();
+        DefaultTableCellRenderer alinharCentro = new DefaultTableCellRenderer();
         alinharCentro.setHorizontalAlignment(SwingConstants.CENTER);
         
         tbContatos = new JTable(tmContatos);
+        
+        tbContatos.getTableHeader().setReorderingAllowed(false);
+        tbContatos.getTableHeader().setResizingAllowed(false);
+        
         tbContatos.getColumnModel().getColumn(0).setPreferredWidth(10);
         tbContatos.getColumnModel().getColumn(1).setPreferredWidth(150);
         tbContatos.getColumnModel().getColumn(2).setPreferredWidth(150);
-        tbContatos.getTableHeader().setReorderingAllowed(false);
-        tbContatos.getTableHeader().setResizingAllowed(false);
         
         tbContatos.getColumnModel().getColumn(0).setCellRenderer(alinharCentro);
         tbContatos.getColumnModel().getColumn(2).setCellRenderer(alinharDireita);
         
-        spContatos = new JScrollPane(tbContatos);
+        spContatos = new JScrollPane();
+        spContatos.setViewportView(tbContatos);
         spContatos.setBounds(10, 70, 375, 280);
         add(spContatos);
     }
@@ -99,6 +106,36 @@ public class ContatoVIEW extends JFrame {
             @Override
             public void keyReleased(KeyEvent e) {
                 carregarTabela();
+            }
+        });
+        btRemover.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ContatoCTRL().excluirContatos(tmContatos, tbContatos);
+            }
+        });
+        btNovo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FormContatoVIEW formulario = new FormContatoVIEW(null, tmContatos);
+                formulario.abrir();
+            }
+        });
+        btEditar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int[] linha = tbContatos.getSelectedRows();
+                if (linha.length == 0 || linha.length > 1) {
+                    JOptionPane.showMessageDialog(null, "Selecione apenas um contato");
+                } else {
+                    Contato c = new Contato();
+                    c.setId((int) tbContatos.getValueAt(linha[0], 0));
+                    c.setNome((String) tbContatos.getValueAt(linha[0], 1));
+                    c.setFone((String) tbContatos.getValueAt(linha[0], 2));
+                    FormContatoVIEW formulario = new FormContatoVIEW(c, tmContatos);
+                    formulario.abrir();
+                }
+                
             }
         });
     }
